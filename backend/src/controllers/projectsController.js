@@ -4,12 +4,19 @@ const { constants } = require("../middlewares/constants");
 
 const createProject = async (req, res, next) => {
   try {
-    const { title, description, techStack, status } = req.body;
+    const { title, description, techStack, status, teamMembers } = req.body;
     if (!title || !description) {
       res.status(constants.VALIDATION_ERROR);
       throw new Error("Project title and description are required");
     }
-    const project = new ProjectModel({ title, description, techStack: techStack || [], createdBy: req.user.id });
+    const project = new ProjectModel({ 
+      title, 
+      description, 
+      techStack: techStack || [], 
+      status: status || 'active',
+      createdBy: req.user.id,
+      teamMembers: teamMembers || []
+    });
     await project.save();
     await project.populate("createdBy", "name email role");
     await project.populate("teamMembers");
@@ -127,6 +134,9 @@ const getProjects = async (req, res, next) => {
 const addTeamMember = async (req, res, next) => {
   try {
     const { memberId } = req.body;
+    const projectId = req.params.id;
+    
+    console.log('🖨️ Adding member to project:', { projectId, memberId });
     
     if (!memberId) {
       res.status(constants.VALIDATION_ERROR);
@@ -140,13 +150,17 @@ const addTeamMember = async (req, res, next) => {
       throw new Error("Member not found");
     }
 
+    console.log('🖨️ Member found:', member.name);
+
     const project = await ProjectModel.findByIdAndUpdate(
-      req.params.id,
+      projectId,
       { $addToSet: { teamMembers: memberId } },
       { new: true }
     )
     .populate("createdBy", "name email role")
     .populate("teamMembers");
+
+    console.log('🖨️ Project updated, teamMembers count:', project.teamMembers.length);
 
     if (!project) {
       res.status(constants.NOT_FOUND);
@@ -155,6 +169,7 @@ const addTeamMember = async (req, res, next) => {
 
     res.status(200).json({ success: true, data: project, message: "Team member added successfully" });
   } catch (err) {
+    console.error('🚨 Error adding team member:', err);
     next(err);
   }
 };
