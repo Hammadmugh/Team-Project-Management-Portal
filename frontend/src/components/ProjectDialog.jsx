@@ -57,9 +57,19 @@ const ProjectDialog = ({
 
   useEffect(() => {
     if (isEditing && initialData) {
+      // Extract team member IDs properly (handle both objects and string IDs)
+      const teamMemberIds = Array.isArray(initialData.teamMembers)
+        ? initialData.teamMembers.map((member) =>
+            typeof member === 'string' ? member : member._id
+          )
+        : [];
+      
       setFormData({
-        ...initialData,
-        teamMembers: initialData.teamMembers || [],
+        title: initialData.title || '',
+        description: initialData.description || '',
+        techStack: initialData.techStack || [],
+        status: initialData.status || 'active',
+        teamMembers: teamMemberIds,
       });
     } else {
       setFormData({
@@ -141,14 +151,23 @@ const ProjectDialog = ({
         sx: {
           borderRadius: '12px',
           boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+          m: { xs: 2, sm: 0 },
+          zIndex: 1400,
+        },
+      }}
+      slotProps={{
+        backdrop: {
+          sx: {
+            zIndex: 1399,
+          },
         },
       }}
     >
-      <DialogTitle sx={{ fontWeight: 'bold', fontSize: '1.25rem' }}>
+      <DialogTitle sx={{ fontWeight: 'bold', fontSize: { xs: '1rem', sm: '1.25rem' } }}>
         {isEditing ? 'Edit Project' : 'Create New Project'}
       </DialogTitle>
 
-      <DialogContent sx={{ pt: 2 }}>
+      <DialogContent sx={{ pt: 2, px: { xs: 2, sm: 3 } }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <TextField
             label="Project Title"

@@ -13,10 +13,10 @@ const options = {
       },
     },
     servers: [
-      // {
-      //   url: "https://dev-squad26-week3-day2-backend.vercel.app",
-      //   description: "Production server",
-      // },
+      {
+        url: "https://team-project-management-portal-back.vercel.app",
+        description: "Production server",
+      },
       {
         url: "http://localhost:3001",
         description: "Development server",
