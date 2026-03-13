@@ -45,12 +45,12 @@ const getProject = async (req, res, next) => {
 
 const updateProject = async (req, res, next) => {
   try {
-    const { title, description, techStack, status } = req.body;
+    const { title, description, techStack, status, teamMembers } = req.body;
 
     // Allow partial updates - at least one field must be provided
-    if (!title && !description && !techStack && !status) {
+    if (!title && !description && !techStack && !status && !teamMembers) {
       res.status(constants.VALIDATION_ERROR);
-      throw new Error("At least one field (title, description, techStack, or status) is required for update");
+      throw new Error("At least one field (title, description, techStack, status, or teamMembers) is required for update");
     }
 
     // Verify project ownership
@@ -70,6 +70,7 @@ const updateProject = async (req, res, next) => {
     if (description) updateData.description = description;
     if (techStack) updateData.techStack = techStack;
     if (status) updateData.status = status;
+    if (teamMembers) updateData.teamMembers = teamMembers;
 
     project = await ProjectModel.findByIdAndUpdate(
       req.params.id,
