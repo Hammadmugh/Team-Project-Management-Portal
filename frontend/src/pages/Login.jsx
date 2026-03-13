@@ -53,22 +53,38 @@ const Login = ({ onLoginSuccess }) => {
 
       const response = await endpoint;
 
-      if (response.data?.data?.token) {
-        localStorage.setItem('token', response.data.data.token);
-        if (response.data.data.id || response.data.data._id) {
-          localStorage.setItem('userId', response.data.data.id || response.data.data._id);
-        }
+      if (isLogin) {
+        // Login flow - auto-login and redirect to dashboard
+        if (response.data?.data?.token) {
+          localStorage.setItem('token', response.data.data.token);
+          if (response.data.data.id || response.data.data._id) {
+            localStorage.setItem('userId', response.data.data.id || response.data.data._id);
+          }
 
+          setAlert({
+            open: true,
+            message: 'Login successful!',
+            type: 'success',
+          });
+
+          onLoginSuccess();
+
+          setTimeout(() => {
+            navigate('/');
+          }, 500);
+        }
+      } else {
+        // Registration flow - redirect to login page
         setAlert({
           open: true,
-          message: isLogin ? 'Login successful!' : 'Registration successful!',
+          message: 'Registration successful! Please log in.',
           type: 'success',
         });
 
-        onLoginSuccess();
-
         setTimeout(() => {
-          navigate('/');
+          setIsLogin(true);
+          setEmail('');
+          setPassword('');
         }, 500);
       }
     } catch (error) {
